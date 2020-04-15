@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>统计学分绩点</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="analyzer.js"></script>
+    <!--[if lt IE 9]>
+    <script src="//cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <style>
+body {
+    min-height: 300px;
+    padding-top: 90px;
+    background: #f6f6f6;
+}
+
+.container {
+    width: 98%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto
+}
+
+.CodeMirror {
+    min-height: 300px;
+    font-family: Menlo, Monaco, Consolas, "Andale Mono", "lucida console", "Courier New", monospace;
+}
+
+#textareaCode {
+    min-height: 300px
+}
+
+#textareaResult {
+    min-height: 300px
+}
+
+#iframeResult {
+    display: block;
+    overflow: hidden;
+    border: 0 !important;
+    min-width: 100px;
+    width: 100%;
+    min-height: 300px;
+    background-color: #fff
+}
+
+@media screen and (max-width:768px) {
+    #textareaCode {
+        height: 300px
+    }
+    #textareaResult {
+        height: 300px
+    }
+
+    .CodeMirror {
+        height: 300px;
+        font-family: Menlo, Monaco, Consolas, "Andale Mono", "lucida console", "Courier New", monospace;
+    }
+
+    #iframeResult {
+        height: 300px
+    }
+
+    .form-inline {
+        padding: 6px 0 2px 0
+    }
+
+}
+    </style>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <form class="form-inline">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <button type="button" onclick="inputHelp()" class="btn btn-default">显示帮助</button>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <button type="button" class="btn btn-success" onclick="beginAnalyze()" id="submitBTN"><span class="glyphicon glyphicon-send"></span> 开始统计</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="panel-body">
+                        <textarea class="form-control" id="textareaCode" name="textareaCode" spellcheck="false"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <form class="form-inline"> <button type="button" class="btn btn-default">统计结果</button></form>
+                    </div>
+                    <div class="panel-body">
+                        <textarea class="form-control" id="textareaResult" name="textareaResult" spellcheck="false"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    var analyzable;
+
+    function inputHelp() {
+        var help = "输入成绩：\n\t1. 登录选课系统\n\t2. 信息查询\n\t3. 成绩查询\n\t4. 查询已修课程最高成绩\n\t5. 选中并复制下面表格中的数据\n\t6. 回到这里，全选粘贴\n\n注意事项：\n\t不要复制表头";
+        document.getElementById("textareaCode").value = help;
+        analyzable = false;
+    }
+
+    function beginAnalyze() {
+        if (analyzable) {}
+        var text = document.getElementById("textareaCode").value;
+        try {
+            var result = json_text(analyze(text));
+            document.getElementById("textareaResult").value = result;
+        }
+        catch(error) {
+            var result = "输入格式有误";
+            document.getElementById("textareaResult").value = result;
+        }
+    }
+
+    inputHelp();
+    </script>
+</body>
+
+</html>
