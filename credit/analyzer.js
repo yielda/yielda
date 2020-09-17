@@ -118,7 +118,7 @@ function analyze(text) {
                 if (a[0] > b[0]) return 1;
                 return 0;
             });
-            value["已修课程"].splice(0, 0, ["课程", "学分", "成绩", "绩点"]);
+            // value["已修课程"].splice(0, 0, ["课程", "学分", "成绩", "绩点"]);
 
             total["需要学分"] += need;
             total["已修学分"] += value["已修学分"];
@@ -158,4 +158,47 @@ function json_text(json) {
     text = text.replace(/},/g, "},\n")
 
     return text;
+}
+
+
+function toD3Json(obj, rootName) {
+    var children0 = [];
+    var d3json = {"name": rootName, "children": children0};
+
+    for (var key in obj) {
+        value = obj[key];
+        if (typeof value == 'number') {
+            children0.push({"name": key + ": " + value});
+        } else {
+            var children1 = [];
+            var child = {"name": key, "children": children1};
+            children0.push(child);
+            for (var k in value) {
+                var v = value[k];
+                if (typeof v == 'number') {
+                    children1.push({"name": k + ": " + v});
+                } else if (Array.isArray(v)) {
+                    var children2 = [];
+                    children1.push({"name": k, "children": children2});
+                    for (var i in v) {
+                        items = v[i];
+                        course_name = items[0];
+                        course_status = [
+                            {"name": "学分： " + items[1]},
+                            {"name": "成绩： " + items[2]}
+                        ];
+                        if (items.length > 3) {
+                            course_status.push({"name": "绩点： " + items[3]});
+                        }
+                        children2.push({
+                            "name": course_name,
+                            "children": course_status
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    return d3json;
 }

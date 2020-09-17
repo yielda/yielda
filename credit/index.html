@@ -6,6 +6,7 @@
     <title>统计学分绩点</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- <script src="https://d3js.org/d3.v5.min.js"></script> -->
     <script src="analyzer.js"></script>
     <!--[if lt IE 9]>
     <script src="//cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
@@ -116,12 +117,20 @@ body {
         analyzable = false;
     }
 
+    function drawTree(data) {
+    }
+
     function beginAnalyze() {
         if (analyzable) {}
         var text = document.getElementById("textareaCode").value;
         try {
-            var result = json_text(analyze(text));
-            document.getElementById("textareaResult").value = result;
+            var json = analyze(text);
+            var text = json_text(json);
+            document.getElementById("textareaResult").value = text;
+
+            d3json = toD3Json(json, "统计学分绩点");
+            console.log(JSON.stringify(d3json));
+            // drawTree(d3json);
         }
         catch(error) {
             var result = "输入格式有误";
