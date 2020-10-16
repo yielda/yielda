@@ -6,25 +6,20 @@ function AI(game) {
   this.simulTime = 200;
   this.freshTime = 200;
   this.workersAvailable = false;
-  workers = null;
   if (window.Worker) {
+    function onmessage(e) {
+      var [direction, score, count] = e.data;
+      this.acceptWorkerStat(direction, score, count);
+    }
     try {
-      workers = [];
+      this.workers = [];
       for (var i = 0; i < 4; i++) {
-        workers.push(new Worker('js/ai.worker.js'));
-        workers[i].onmessage = function (e) {
-          var [direction, score, count] = e.data;
-          this.acceptWorkerStat(direction, score, count);
-        };
+        worker = new Worker('js/ai.worker.js');
+        worker.onmessage = onmessage.bind(this);
+        this.workers.push(worker);
       }
-      if (workers && workers.length == 4 && workers[0]) {
-        this.workersAvailable = true;
-        this.freshTime = 5; /*0*/
-        this.workers = [];
-        for (var i = 0; i < 4; ++i) {
-          this.workers.push(workers[i].onmessage.bind(this));
-        }
-      }
+      this.workersAvailable = true;
+      this.freshTime = 5; /*0*/
     } catch (e) {
       alert("Worker not available.")
     }
