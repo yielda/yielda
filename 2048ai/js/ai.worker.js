@@ -1,3 +1,5 @@
+importScripts("game_simulator.js");
+
 onmessage = function (e) {
   var score = 0, count = 0;
   var [another, direction, simulTime] = e.data;
