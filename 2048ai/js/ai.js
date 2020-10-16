@@ -108,7 +108,7 @@ window.addEventListener('load', function () {
   if (window.Worker) {
     window.workers = [];
     for (var i = 0; i < 4; i++) {
-      workers.push(new Worker('ai.worker.js'));
+      workers.push(new Worker('js/ai.worker.js'));
       workers[i].onmessage = function (e) {
         var [direction, score, count] = e.data;
         this.acceptWorkerStat(direction, score, count);
