@@ -40,10 +40,12 @@ GameManager.prototype.stopAI = function () {
 };
 
 GameManager.prototype.toggleAI = function () {
-  if (this.aiIsRunning) {
-    this.stopAI();
-  } else {
-    this.runAI();
+  if (!this.isGameTerminated()) {
+    if (this.aiIsRunning) {
+      this.stopAI();
+    } else {
+      this.runAI();
+    }
   }
 };
 
