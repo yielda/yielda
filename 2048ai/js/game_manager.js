@@ -3,7 +3,7 @@ function GameManager(size, AI, InputManager, Actuator, StorageManager) {
   this.inputManager = new InputManager();
   this.storageManager = new StorageManager();
   this.actuator = new Actuator();
-  this.ai = new AI(this, window.workers);
+  this.ai = new AI(this);
   this.aiIsRunning = false;
 
   this.startTiles = 2;

@@ -1,4 +1,4 @@
-function AI(game, workers=null) {
+function AI(game) {
   this.actualGame = game;
   this.bestDirection = null;
   this.isReallyMove = true;
@@ -6,12 +6,27 @@ function AI(game, workers=null) {
   this.simulTime = 200;
   this.freshTime = 200;
   this.workersAvailable = false;
-  if (workers && workers.length == 4 && workers[0]) {
-    this.workersAvailable = true;
-    this.freshTime = 5; /*0*/
-    this.workers = [];
-    for (var i = 0; i < 4; ++i) {
-      this.workers.push(workers[i].onmessage.bind(this));
+  workers = null;
+  if (window.Worker) {
+    try {
+      workers = [];
+      for (var i = 0; i < 4; i++) {
+        workers.push(new Worker('js/ai.worker.js'));
+        workers[i].onmessage = function (e) {
+          var [direction, score, count] = e.data;
+          this.acceptWorkerStat(direction, score, count);
+        };
+      }
+      if (workers && workers.length == 4 && workers[0]) {
+        this.workersAvailable = true;
+        this.freshTime = 5; /*0*/
+        this.workers = [];
+        for (var i = 0; i < 4; ++i) {
+          this.workers.push(workers[i].onmessage.bind(this));
+        }
+      }
+    } catch (e) {
+      alert("Worker not available.")
     }
   }
 }
@@ -101,18 +116,3 @@ AI.prototype.selectDirection = function() {
     }
   }
 }
-
-// create workers
-window.addEventListener('load', function () {
-  window.workers = null;
-  if (window.Worker) {
-    window.workers = [];
-    for (var i = 0; i < 4; i++) {
-      workers.push(new Worker('js/ai.worker.js'));
-      workers[i].onmessage = function (e) {
-        var [direction, score, count] = e.data;
-        this.acceptWorkerStat(direction, score, count);
-      };
-    }
-  }
-});
