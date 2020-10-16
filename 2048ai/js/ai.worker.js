@@ -18,5 +18,5 @@ onmessage = function (e) {
       break;
     }
   }
-  postMessage(direction, score, count);
+  postMessage([direction, score, count]);
 };
