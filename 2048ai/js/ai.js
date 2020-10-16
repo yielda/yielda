@@ -63,7 +63,7 @@ AI.prototype.autoMove = function() {
     this.initSimulStat();
     if (this.workersAvailable) {
       for (var i = 0; i < 4; ++i) {
-        this.workers[i].postMessage(this, i);
+        this.workers[i].postMessage([this, i]);
       }
     } else {
       this.runSimulations();
