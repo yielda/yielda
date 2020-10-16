@@ -59,8 +59,6 @@ GameManager.prototype.showHint = function () {
     this.aiIsRunning = true;
     this.ai.isReallyMove = false;
     this.ai.autoMove();
-    this.ai.isReallyMove = true;
-    this.aiIsRunning = false;
     // console.log("showHint: selectDirection done");
   }
   if (this.ai.bestDirection != null) {

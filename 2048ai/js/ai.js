@@ -99,6 +99,9 @@ AI.prototype.selectDirectionAndDoActualMove = function() {
     // console.log(direction);
     // this.actualGame.actuator.addToConsole(direction, this.simulScores, this.simulCounts);
     setTimeout(this.autoMove.bind(this), this.freshTime);
+  } else {
+    this.isReallyMove = true;
+    this.aiIsRunning = false;
   }
 }
 
