@@ -1,11 +1,11 @@
 onmessage = function (e) {
   var score = 0, count = 0;
-  var [ai, direction] = e.data;
-  var endTime = new Date().getTime() + ai.simulTime;
-  var baseScore = ai.simulator.score;
+  var [another, direction, simulTime] = e.data;
+  var endTime = new Date().getTime() + simulTime;
   var simulator = new GameSimulator();
+  var baseScore = another.score;
   while (new Date().getTime() < endTime) {
-    simulator.copyFromAnother(ai.simulator);
+    simulator.copyFromAnother(another);
     if (simulator.move(direction)) {
         while (simulator.isAlive()) {
           simulator.move(Math.floor(Math.random() * 4));
@@ -16,6 +16,5 @@ onmessage = function (e) {
       break;
     }
   }
-  // ai.acceptWorkerStat(direction, score, count);
   postMessage(direction, score, count);
 };
