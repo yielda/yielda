@@ -73,6 +73,9 @@ GameManager.prototype.showHint = function () {
 GameManager.prototype.keepPlaying = function () {
   this.keepPlaying = true;
   this.actuator.continueGame(); // Clear the game won/lost message
+  if (this.previousAiIsRunning) {
+    this.runAI();
+  }
 };
 
 // Return true if the game is lost, or has won and the user hasn't kept playing
@@ -134,6 +137,13 @@ GameManager.prototype.actuate = function () {
     this.storageManager.clearGameState();
   } else {
     this.storageManager.setGameState(this.serialize());
+  }
+
+  if (this.isGameTerminated() && this.aiIsRunning) {
+    this.stopAI();
+    if (this.won) {
+      this.previousAiIsRunning = true;
+    }
   }
 
   this.actuator.actuate(this.grid, {
