@@ -189,7 +189,7 @@ AI.prototype.checkContinue = function() {
 AI.prototype.checkPauseOrStop = function() {
   this.bestDirection = null;
   if (this.actualGame.isGameTerminated() && this.isRunning) {
-    if (this.actualGame.won) {
+    if (this.actualGame.won && !this.actualGame.over) {
       this.pause();
     } else {
       this.stop();
