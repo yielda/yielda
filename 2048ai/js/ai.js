@@ -1,10 +1,13 @@
 function AI(game) {
   this.actualGame = game;
+  this.storage = game.storageManager;
   this.bestDirection = null;
   this.isReallyMove = true;
-  this.simulator = new GameSimulator()
+  this.simulator = new GameSimulator();
   this.simulTime = 200;
   this.freshTime = 200;
+  this.isRunning = false;
+  this.isPaused = false;
   this.workersAvailable = false;
   if (window.Worker) {
     function onmessage(e) {
@@ -21,7 +24,7 @@ function AI(game) {
       this.workersAvailable = true;
       this.freshTime = 5; /*0*/
     } catch (e) {
-      alert("Worker not available.")
+      alert("Worker not available.");
     }
   }
 }
@@ -53,7 +56,7 @@ AI.prototype.runSimulations = function() {
 }
 
 AI.prototype.autoMove = function() {
-  if (!this.actualGame.isGameTerminated() && this.actualGame.aiIsRunning) {
+  if (!this.actualGame.isGameTerminated() && this.isRunning) {
     var simulTime = parseInt(document.getElementById('simulTime').value);
     // If workersAvailable, 200(ms) animation fresh time.
     if (!isNaN(simulTime) && simulTime > 0) {
@@ -100,8 +103,9 @@ AI.prototype.selectDirectionAndDoActualMove = function() {
     // this.actualGame.actuator.addToConsole(direction, this.simulScores, this.simulCounts);
     setTimeout(this.autoMove.bind(this), this.freshTime);
   } else {
+    this.isRunning = false;
     this.isReallyMove = true;
-    this.aiIsRunning = false;
+    this.showCachedHint();
   }
 }
 
@@ -112,5 +116,94 @@ AI.prototype.selectDirection = function() {
       this.bestDirection = i;
       maxScores = this.simulScores[i];
     }
+  }
+}
+
+AI.prototype.showHint = function() {
+  if (this.isRunning) {
+    // console.log("showHint: AI is running");
+    return;
+  }
+  if (!this.showCachedHint()) {
+    this.isRunning = true;
+    this.isReallyMove = false;
+    this.autoMove();
+  }
+}
+
+AI.prototype.showCachedHint = function() {
+  if (this.bestDirection != null) {
+    var type = ['up', 'right', 'down', 'left'][this.bestDirection];
+    var hint = ['⇑', '⇒', '⇓', '⇐'][this.bestDirection];
+    // console.log("showCachedHint: " + hint);
+    this.actualGame.actuator.showHint(type, hint);
+    return true;
+  }
+  return false;
+}
+
+AI.prototype.run = function() {
+  this.isRunning = true;
+  this.isPaused = false;
+  this.saveState(true);
+  this.autoMove();
+  document.querySelector('.run-ai-button').innerHTML = 'Stop AI';
+  document.body.classList.add('stop-ai');
+  document.body.classList.remove('run-ai');
+}
+
+AI.prototype.stop = function() {
+  this.isRunning = false;
+  this.isPaused = false;
+  this.saveState(false);
+  document.querySelector('.run-ai-button').innerHTML = 'Run AI';
+  document.body.classList.add('run-ai');
+  document.body.classList.remove('stop-ai');
+}
+
+AI.prototype.toggle = function() {
+  if (this.isRunning) {
+    this.stop();
+  } else {
+    this.run();
+  }
+}
+
+AI.prototype.pause = function() {
+  this.isPaused = true;
+  this.isRunning = false;
+  this.saveState(false);
+  document.querySelector('.run-ai-button').innerHTML = 'Paused';
+  document.body.classList.add('run-ai');
+  document.body.classList.remove('stop-ai');
+}
+
+AI.prototype.checkContinue = function() {
+  if (this.isPaused) {
+    this.run();
+  }
+}
+
+AI.prototype.checkPauseOrStop = function() {
+  this.bestDirection = null;
+  if (this.actualGame.isGameTerminated() && this.isRunning) {
+    if (this.actualGame.won) {
+      this.pause();
+    } else {
+      this.stop();
+    }
+  }
+}
+
+AI.prototype.saveState = function(state) {
+  this.storage.set('ai-is-running', this.isRunning);
+  this.storage.set('ai-simul-time', this.simulTime);
+}
+
+AI.prototype.loadState = function() {
+  var value = this.storage.get('ai-simul-time', 200);
+  document.getElementById('simulTime').value = value;
+  if (this.storage.get('ai-is-running', false)) {
+    this.run();
   }
 }

@@ -4,7 +4,6 @@ function GameManager(size, AI, InputManager, Actuator, StorageManager) {
   this.storageManager = new StorageManager();
   this.actuator = new Actuator();
   this.ai = new AI(this);
-  this.aiIsRunning = false;
 
   this.startTiles = 2;
 
@@ -24,48 +23,17 @@ GameManager.prototype.restart = function () {
   this.setup();
 };
 
-GameManager.prototype.runAI = function () {
-  this.aiIsRunning = true;
-  this.ai.autoMove();
-  document.querySelector('.run-ai-button').innerHTML = 'Stop AI';
-  document.body.classList.add('stop-ai');
-  document.body.classList.remove('run-ai');
-};
-
-GameManager.prototype.stopAI = function () {
-  this.aiIsRunning = false;
-  document.querySelector('.run-ai-button').innerHTML = 'Run AI';
-  document.body.classList.add('run-ai');
-  document.body.classList.remove('stop-ai');
-};
-
 GameManager.prototype.toggleAI = function () {
+  // console.log("GameManager::toggleAI: start");
   if (!this.isGameTerminated()) {
-    if (this.aiIsRunning) {
-      this.stopAI();
-    } else {
-      this.runAI();
-    }
+    this.ai.toggle();
   }
 };
 
 GameManager.prototype.showHint = function () {
-  // console.log("showHint: start");
-  if (this.aiIsRunning) {
-    // console.log("showHint: AI is running");
-    return;
-  }
-  if (this.ai.bestDirection == null) {
-    this.aiIsRunning = true;
-    this.ai.isReallyMove = false;
-    this.ai.autoMove();
-    // console.log("showHint: selectDirection done");
-  }
-  if (this.ai.bestDirection != null) {
-    var type = ['up', 'right', 'down', 'left'][this.ai.bestDirection];
-    var hint = ['⇑', '⇒', '⇓', '⇐'][this.ai.bestDirection];
-    // console.log("showHint: " + hint);
-    this.actuator.showHint(type, hint);
+  // console.log("GameManager::showHint: start");
+  if (!this.isGameTerminated()) {
+    this.ai.showHint();
   }
 };
 
@@ -73,9 +41,7 @@ GameManager.prototype.showHint = function () {
 GameManager.prototype.keepPlaying = function () {
   this.keepPlaying = true;
   this.actuator.continueGame(); // Clear the game won/lost message
-  if (this.previousAiIsRunning) {
-    this.runAI();
-  }
+  this.ai.checkContinue();
 };
 
 // Return true if the game is lost, or has won and the user hasn't kept playing
@@ -107,6 +73,7 @@ GameManager.prototype.setup = function () {
 
   // Update the actuator
   this.actuate();
+  this.ai.loadState();
 };
 
 // Set up the initial tiles to start the game with
@@ -139,12 +106,7 @@ GameManager.prototype.actuate = function () {
     this.storageManager.setGameState(this.serialize());
   }
 
-  if (this.isGameTerminated() && this.aiIsRunning) {
-    this.stopAI();
-    if (this.won) {
-      this.previousAiIsRunning = true;
-    }
-  }
+  this.ai.checkPauseOrStop();
 
   this.actuator.actuate(this.grid, {
     score: this.score,
@@ -245,7 +207,6 @@ GameManager.prototype.move = function (direction) {
 
     this.actuate();
   }
-  this.ai.bestDirection = null;
 };
 
 // Get the vector representing the chosen direction

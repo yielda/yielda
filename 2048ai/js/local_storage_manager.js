@@ -42,6 +42,16 @@ LocalStorageManager.prototype.localStorageSupported = function () {
 };
 
 // Best score getters/setters
+LocalStorageManager.prototype.get = function (key, defaultValue=undefined) {
+  var jsonValue = this.storage.getItem(key);
+  return jsonValue ? JSON.parse(jsonValue) : defaultValue;
+};
+
+LocalStorageManager.prototype.set = function (key, value) {
+  this.storage.setItem(key, value);
+};
+
+// Best score getters/setters
 LocalStorageManager.prototype.getBestScore = function () {
   return this.storage.getItem(this.bestScoreKey) || 0;
 };
