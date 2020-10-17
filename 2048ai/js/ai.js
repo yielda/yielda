@@ -57,11 +57,13 @@ AI.prototype.runSimulations = function() {
 
 AI.prototype.autoMove = function() {
   if (!this.actualGame.isGameTerminated() && this.isRunning) {
-    var simulTime = parseInt(document.getElementById('simulTime').value);
+    var elem = document.getElementById('simulTime');
+    var simulTime = parseInt(elem.value);
     // If workersAvailable, 200(ms) animation fresh time.
     if (!isNaN(simulTime) && simulTime > 0) {
       this.simulTime = Math.max(simulTime, this.workersAvailable ? 200 : 20);
     }
+    elem.value = this.simulTime;
     this.simulator.copyFromGame(this.actualGame);
     this.initSimulStat();
     if (this.workersAvailable) {
